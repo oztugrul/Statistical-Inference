@@ -1,0 +1,125 @@
+---
+title: "Statistical Inference Part 2"
+author: "Ozge Tugrul Sonmez"
+date: "12/072019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 2: Basic Inferential Data Analysis Instructions
+
+
+```{r}
+library(datasets)
+library(ggplot2)
+```
+
+### 1-Load the ToothGrowth data and perform some basic exploratory data analyses
+
+#### Data Description
+
+The response is the length of odontoblasts (cells responsible for tooth growth) in 60 guinea pigs. Each animal received one of three dose levels of vitamin C (0.5, 1, and 2 mg/day) by one of two delivery methods, orange juice or ascorbic acid (a form of vitamin C and coded as VC).
+
+
+```{r}
+
+data(ToothGrowth)
+str(ToothGrowth)
+
+#The length is numeric and it is dependent variable. The supplement is factor. The dose should also be a factor in order to implement t-test.
+
+ToothGrowth$dose <- factor(ToothGrowth$dose)
+
+#Boxplots of Toothgrowth according to Supplements and Dose is shown below.
+
+ggplot(data=ToothGrowth, aes(x=supp, y=len)) + geom_boxplot(aes(fill=supp)) +
+  labs(title = "Boxplot of ToothGrowth According to Supplement ",
+       x = "Supplement Type", y = "Tooth length")
+
+
+ggplot(data=ToothGrowth, aes(x=dose, y=len)) + geom_boxplot(aes(fill=dose)) +
+  labs(title = "Boxplot of ToothGrowth According to Dose",
+       x = "Dose in miligrams/day", y = "Tooth length")
+
+```
+
+### 2-Provide a basic summary of the data.
+
+```{r}
+summary(ToothGrowth)
+
+require(graphics)
+
+coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
+        xlab = "ToothGrowth data: length vs dose, given type of supplement")
+
+```
+
+According to the graphic, given the type of the supplement, increase in the lower doses effect in toothgrowth more than increase in higher doses. Also, the dose of the supplements seem to differentiate in toothgrowth. 
+
+In overall, the supplement types orange juice and vitamin C do not differentiate much in toothgrowth. 
+
+
+### 3-Use confidence intervals and/or hypothesis tests to compare toothgrowth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+
+
+Hypothesis test whether the supplements(Orange Juice and Vitamin C) have an effect on tooth lengths.
+
+95 percent confidence interval includes 0. So, the **null hypothesis** that the mean of the toothgrowth by the supplement Orange Juice and the supplement Vitamin C is equal **is not rejected**. 
+
+```{r}
+t.test(len~supp,data=ToothGrowth)
+
+```
+
+
+Hypothesis test whether the dose 0.5 and the dose 1 have different effects on tooth lengths.
+
+95 percent confidence interval does not include 0. So the null hypothesis of equal mean is rejected.
+
+```{r}
+ToothGrowth_v2<-subset(ToothGrowth,dose%in%c(0.5,1))
+
+t.test(len~dose,paired=FALSE,var.equal=TRUE,data=ToothGrowth_v2)
+
+```
+
+
+Hypothesis test whether the dose 1 and the dose 2 have different effects on tooth lengths.
+
+95 percent confidence interval does not include 0. So the null hypothesis of equal mean is rejected.
+
+
+```{r}
+ToothGrowth_v3<-subset(ToothGrowth,dose%in%c(1,2))
+
+t.test(len~dose,paired=FALSE,var.equal=TRUE,data=ToothGrowth_v3)
+
+```
+
+
+### 4-State your conclusions and the assumptions needed for your conclusions.
+
+1- The supplements Orange Juice and Vitamin C does not differentiate. The null hypothesis of equal mean toothgrowth is not rejected. 
+
+2-The dose 0.5 and the dose 1 have different effects on tooth lengths. The null hypothesis of equal mean toothgrowth is rejected.
+
+3-The dose 1 and the dose 2 have different effects on tooth lengths. The null hypothesis of equal mean toothgrowth is rejected.
+
+T
+The assumptions of t test is that the population from which samples are drawn is normally distributed.
+
+Samples are randomly distributed.
+
+The groups have equal variance.
+
+The other factors  are distributed homogeneous in groups. For example in t test of Orange Juice and Vitamin C, three dosage of supplements are assumed to be equally distributed in both supplement groups.
+
+Also, in the t tests of two doses (0.5 and 1) and (1 and 2), the type of supplements Orange Juice and Vitamin C are assumed to be equally distributed in two different doses.
+
+
+
+
